@@ -1,0 +1,9 @@
+.listDrop {
+    cursor: pointer;
+    padding: 5px 10px;
+}
+
+.listDrop:hover {
+    background-color: rgba(183, 177, 177, 0.27);
+
+}
