@@ -1,4 +1,67 @@
-# Getting Started with Create React App
+# Reconnect AI
+
+## Character
+
+<div style="display: flex; flex-direction: row; gap: 10px;">
+
+<div>
+
+To use the chat, you need to create a character with whom he wants to communicate. When creating it, you need to specify **a name, description, portrait, and voice sample**.
+
+The name and description are used by language models at the first level to create a chatbot that imitates the style and manner of text communication of a specific character based on knowledge about him.
+
+The voice sample is used to imitate this voice for voicing text messages received at the level above.
+
+By combining the portrait and the generated voice message, we get a video response in which our character, depicted in the attached picture, moves his lips, imitating the facial expressions of a person when speaking.
+
+The described fields are mandatory to fill in and are the minimum requirement for obtaining the expected result - a talking character.
+
+</div>
+
+<figure style="text-align: center;">
+  <img src="images/create-form.png" alt="Character Create Form">
+  <figcaption>Character Create Form</figcaption>
+</figure>
+
+<figure style="text-align: center;">
+  <img src="images/edit-form.png" alt="Character Edit Form">
+  <figcaption>Character Edit Form</figcaption>
+</figure>
+
+</div>
+
+## Message
+
+<div style="display: flex; flex-direction: row; gap: 10px;">
+
+<figure style="text-align: center;">
+  <img src="images/messages.png" alt="Messages">
+  <figcaption>Messages</figcaption>
+</figure>
+
+<div>
+
+The message can be text or voice. If the message is voice, then its translation into text is carried out by a separate service, for this a task is created and sent to the broker.
+
+The answer to the message can be of 3 types: **text, audio and video**.
+
+<figure style="text-align: center;">
+  <img src="images/text-answer.png" alt="Example of text answe">
+  <figcaption>Example of text answer</figcaption>
+</figure>
+<figure style="text-align: center;">
+  <img src="images/audio-answer.png" alt="Example of audio answe">
+  <figcaption>Example of audio answe</figcaption>
+</figure>
+<figure style="text-align: center;">
+  <img src="images/video-answer.png" alt="Example of video answe">
+  <figcaption>Example of video answe</figcaption>
+</figure>
+
+</div>
+</div>
+
+## Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
