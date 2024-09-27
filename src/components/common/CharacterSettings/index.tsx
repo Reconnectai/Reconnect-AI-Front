@@ -1,6 +1,6 @@
 import { yupResolver } from '@hookform/resolvers/yup'
 import { enqueueSnackbar } from 'notistack'
-import React, {FC, useEffect, useRef, useState} from 'react'
+import React, { FC, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
@@ -57,11 +57,44 @@ interface IProps {
   setGoToEnd?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
+export const acceptAudioFormats = [
+  'audio/mpeg',
+  'audio/mp3',
+  'audio/wav',
+  'audio/x-wav',
+  'audio/wave',
+  'audio/x-pn-wav',
+  'audio/vnd.wave',
+  'audio/ogg',
+  'audio/vorbis',
+  'application/ogg',
+  'audio/opus',
+  'audio/flac',
+  'audio/x-flac',
+  'audio/mp4',
+  'audio/x-m4a',
+  'audio/aac',
+  'audio/aac',
+  'audio/x-aac',
+  'audio/x-ms-wma',
+  'audio/amr',
+  'audio/amr-wb',
+  'audio/aiff',
+  'audio/x-aiff',
+  'audio/mpeg',
+  'audio/x-mpeg',
+  'audio/mp2',
+  'audio/midi',
+  'audio/x-midi',
+  'audio/3gpp',
+  'audio/3gpp2',
+  'audio/webm',
+]
 const CharacterSettingPage: FC<IProps> = ({
   setOpenCharacterSettingsDrawer,
   currentCharacter,
   isFullOpen,
-                                            setGoToEnd
+  setGoToEnd,
 }) => {
   const dispatch: AppDispatch = useDispatch()
   const theme = useTheme()
@@ -104,7 +137,7 @@ const CharacterSettingPage: FC<IProps> = ({
         name:
           VIDEO_CHAT_OPTIONS.find((v) => v.value === currentCharacter?.videoChatType)?.name || '',
       },
-      prompt:currentCharacter?.prompt || ''
+      prompt: currentCharacter?.prompt || '',
     },
   })
   const onSubmit = async (data: FormValues) => {
@@ -150,7 +183,7 @@ const CharacterSettingPage: FC<IProps> = ({
           textChatType: data.textChatType?.value || '',
           ...(data.speechChatType?.value ? { speechChatType: data.speechChatType?.value } : {}),
           ...(data.videoChatType?.value ? { videoChatType: data.videoChatType?.value } : {}),
-          prompt:data.prompt
+          prompt: data.prompt,
         })
           .unwrap()
           .then(() => {
@@ -205,16 +238,16 @@ const CharacterSettingPage: FC<IProps> = ({
   useEffect(() => {
     const fetchImage = async (url: string) => {
       try {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        const file = new File([blob], 'avatar', { type: blob.type });
+        const response = await fetch(url)
+        const blob = await response.blob()
+        const file = new File([blob], 'avatar', { type: blob.type })
         setAvatarUrl(URL.createObjectURL(file))
       } catch (error) {
-        console.error('Error fetching image:', error);
+        console.error('Error fetching image:', error)
       }
-    };
-    currentCharacter?.id && fetchImage(currentCharacter?.image);
-  }, [currentCharacter]);
+    }
+    currentCharacter?.id && fetchImage(currentCharacter?.image)
+  }, [currentCharacter])
   return (
     <Box
       sx={{
@@ -280,8 +313,8 @@ const CharacterSettingPage: FC<IProps> = ({
             fileRef={voiceRef}
             setUrl={setAudioUrl}
             id="voiceExampleInput"
-            accept=".mp3,.wav,.mpeg"
-            acceptArr={['audio/mpeg', 'audio/wav', 'audio/mp3']}
+            accept={acceptAudioFormats.join(',')}
+            acceptArr={acceptAudioFormats}
             prevFile={watch('audio')}
             prevFileUrl={audioUrl}
           />
@@ -311,7 +344,14 @@ const CharacterSettingPage: FC<IProps> = ({
           />
         </Box>
         <TextInputControlled name="name" label="Name" errors={errors} control={control} />
-        <TextInputControlled name="prompt" label="Prompt" errors={errors} control={control} multiline={true} minRows={2} />
+        <TextInputControlled
+          name="prompt"
+          label="Prompt"
+          errors={errors}
+          control={control}
+          multiline={true}
+          minRows={2}
+        />
         {currentCharacter ? (
           <Box sx={{ display: 'flex', gap: '10px', justifyContent: 'end' }}>
             <CustomButton

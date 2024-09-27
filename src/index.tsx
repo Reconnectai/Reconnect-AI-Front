@@ -1,28 +1,38 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import reportWebVitals from './reportWebVitals';
-import {RouterProvider} from "react-router-dom";
-import router from "./pages";
-import {Provider} from "react-redux";
-import {store} from "./store";
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import './index.css'
+import reportWebVitals from './reportWebVitals'
+import { BrowserRouter } from 'react-router-dom'
+import { Provider } from 'react-redux'
+import { store } from './store'
 import { SnackbarProvider } from 'notistack'
-import {CustomThemeProvider} from "./theme/themeContext";
+import { CustomThemeProvider } from './theme/themeContext'
+import AppRouter from './pages'
+import { PetraWallet } from 'petra-plugin-wallet-adapter'
+import { AptosWalletAdapterProvider } from '@aptos-labs/wallet-adapter-react'
 
+const wallets = [new PetraWallet()]
 const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
-    <Provider store={store}>
-        <CustomThemeProvider>
-        <SnackbarProvider>
-            <RouterProvider router={router} />
-        </SnackbarProvider>
-    </CustomThemeProvider>
-    </Provider>
-);
+  document.getElementById('root') as HTMLElement,
+)
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+root.render(
+  <AptosWalletAdapterProvider
+    plugins={wallets}
+    autoConnect={true}
+    onError={(error) => {
+      console.log('error', error)
+    }}>
+    <Provider store={store}>
+      <CustomThemeProvider>
+        <SnackbarProvider>
+          <BrowserRouter>
+            <AppRouter />
+          </BrowserRouter>
+        </SnackbarProvider>
+      </CustomThemeProvider>
+    </Provider>
+  </AptosWalletAdapterProvider>,
+)
+
+reportWebVitals()

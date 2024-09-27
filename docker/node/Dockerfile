@@ -8,8 +8,8 @@ RUN  npm                install
 ADD  .                  ${APPDIR}/
 ARG  BUILD_APP_ENV
 RUN  echo "${BUILD_APP_ENV}" | base64 -d > ${APPDIR}/.env || TEST=1
-RUN  cat .env
-RUN  source .env
+RUN  . ${APPDIR}/.env
+RUN  printenv
 RUN  npm run build
 
 FROM nginx:mainline-alpine AS nginx

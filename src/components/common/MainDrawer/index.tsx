@@ -1,20 +1,24 @@
 import { ReactComponent as Logo } from 'assets/logo.svg'
-import JW from 'assets/testAvatar/JohnnieWilliams.png'
+import JW from 'assets/testAvatar/JohnnieWilliams.jpg'
 import React, { FC, useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
+import { AppDispatch, RootState } from 'store'
+import { logout } from 'store/reducers/userReducer'
+import { preloadImages } from 'utils/preloadingImages'
 
 import ContactSupportIcon from '@mui/icons-material/ContactSupport'
 import PersonIcon from '@mui/icons-material/Person'
-import SettingsIcon from '@mui/icons-material/Settings'
-import { Box, Drawer, Skeleton, Typography, useTheme } from '@mui/material'
+import { Box, Drawer, Skeleton, Tooltip, Typography, useTheme } from '@mui/material'
 
 import SwitchTheme from '../SwitchTheme'
 import Capabilities from './Capabilities'
 import DialogToDrawerItems from './DialogToDrawerItems'
 import DrawerItem from './DrawerItem'
 import Profile from './Profile'
-import Settings from './Settings'
-import {preloadImages} from "utils/preloadingImages";
+import Balance from './Balance'
+import AptosImg from 'assets/aptos.png'
+import { useGetBalanceQuery } from 'services/aptos/api'
 
 interface IProps {
   user: {
@@ -28,9 +32,12 @@ interface IProps {
 
 const MainDrawer: FC<IProps> = ({ user, openMainDrawer, setOpenMainDrawer }) => {
   const theme = useTheme()
+  const { data: balance } = useGetBalanceQuery()
+  const { address } = useSelector((state: RootState) => state.user)
   const [checkedItem, setCheckedItem] = useState<string>('')
   const [isAvatarLoad, setIsAvatarLoad] = useState<boolean>(false)
   const location = useLocation()
+  const dispatch = useDispatch<AppDispatch>()
   useEffect(() => {
     setOpenMainDrawer(false)
     setCheckedItem('')
@@ -161,19 +168,50 @@ const MainDrawer: FC<IProps> = ({ user, openMainDrawer, setOpenMainDrawer }) => 
                 </Typography>
               </Box>
             )}
+            <Tooltip title={address}>
+              <Typography
+                sx={{
+                  fontSize: '14px',
+                  fontWeight: 700,
+                  lineHeight: '20px',
+                  textAlign: 'left',
+                  color: theme.palette.text.primary,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  width: '200px',
+                }}
+              > {address}
+                {/*{`${user?.firstName} ${user?.lastName}`}*/}
+              </Typography>
+            </Tooltip>
+
+          </Box>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              height: '100%',
+            }}
+          >
             <Typography
+              onClick={() => {
+                dispatch(logout())
+              }}
               sx={{
                 fontSize: '14px',
                 fontWeight: 700,
                 lineHeight: '20px',
                 textAlign: 'left',
                 color: theme.palette.text.primary,
+                cursor: 'pointer',
               }}
             >
-              {`${user?.firstName} ${user?.lastName}`}
+              Logout
             </Typography>
-          </Box>
-          <SwitchTheme />
+            <SwitchTheme />
+          </Box>{' '}
         </Box>
 
         <Box
@@ -187,8 +225,8 @@ const MainDrawer: FC<IProps> = ({ user, openMainDrawer, setOpenMainDrawer }) => 
             {' '}
             <PersonIcon sx={{ width: '25px', height: '25px' }} />
           </DrawerItem>
-          <DrawerItem title="Settings" setCheckedItem={setCheckedItem}>
-            <SettingsIcon sx={{ width: '25px', height: '25px' }} />
+          <DrawerItem title="Balance" setCheckedItem={setCheckedItem}>
+            <Box component="img" src={AptosImg} sx={{ width: '25px', height: '25px' }} />
           </DrawerItem>
           <DrawerItem title="Capabilities" setCheckedItem={setCheckedItem}>
             <ContactSupportIcon sx={{ width: '25px', height: '25px' }} />
@@ -200,9 +238,9 @@ const MainDrawer: FC<IProps> = ({ user, openMainDrawer, setOpenMainDrawer }) => 
           <Profile />
         </DialogToDrawerItems>
       )}
-      {checkedItem === 'Settings' && (
-        <DialogToDrawerItems title={'Settings'} setCheckedItem={setCheckedItem}>
-          <Settings />
+      {checkedItem === 'Balance' && (
+        <DialogToDrawerItems title={'Balance'} setCheckedItem={setCheckedItem}>
+          <Balance currentRate={balance?.rate || 0} balance={balance?.balance || 0} setCheckedItem={setCheckedItem} />
         </DialogToDrawerItems>
       )}
       {checkedItem === 'Capabilities' && (

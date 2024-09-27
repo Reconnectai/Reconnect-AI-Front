@@ -34,11 +34,11 @@ const DialogToDrawerItems: FC<IProps> = ({ title, setCheckedItem, children }) =>
           display: 'flex',
           flexDirection: 'column',
           backgroundColor: theme.palette.background.default,
-          border: '1px solid white',
+          boxShadow: `0 0 2px 3px ${theme.palette.background.paper}`,
         },
       }}
     >
-      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '600px' }}>
+      <Box sx={{ display: 'flex', gap: '50px', flexDirection: 'column', minHeight: '600px' }}>
         <Box
           sx={{
             display: 'flex',

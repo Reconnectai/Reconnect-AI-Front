@@ -21,6 +21,7 @@ interface IProps {
   goToEnd: boolean
   isChat: boolean
   regenerateMessageHandler: (lastMessageId:string)=>void
+  socketChat: any | null
 }
 
 const MessageRenderSection: FC<IProps> = ({
@@ -32,7 +33,9 @@ const MessageRenderSection: FC<IProps> = ({
   handleScroll,
   goToEnd,
   isChat,
-                                            regenerateMessageHandler
+
+                                            regenerateMessageHandler,
+                                            socketChat
 }) => {
   const theme = useTheme()
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
@@ -97,7 +100,7 @@ const MessageRenderSection: FC<IProps> = ({
       }}
       onScroll={handleScrollWithSave}
     >
-      {character && !isLoadingCharacter && !isChat && !character?.error && (
+      {character && !isLoadingCharacter && socketChat && !isChat && !character?.error && (
         <PopoverCreateChat confirmTitle="Wait, character creation in progress..." />
       )}
       {character && !isLoadingCharacter && character?.error && (

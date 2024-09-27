@@ -5,7 +5,7 @@ type InitialState = {
 };
 
 const initialState: InitialState = {
-  isCharacterListQuery: true,
+  isCharacterListQuery: false,
 };
 
 const characterListSlice = createSlice({

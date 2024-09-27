@@ -1,9 +1,10 @@
 import { requiredMessage } from 'validation'
 import * as yup from 'yup'
+import {acceptAudioFormats} from "./index";
 
 export const CHARACTER_SETTINGS_SCHEMA_CREATE = yup.object().shape({
   name: yup.string().trim().max(20, 'Max 20 characters').required(requiredMessage),
-  prompt: yup.string().trim().max(1000, 'Max 1000 characters').required(requiredMessage),
+  prompt: yup.string().trim().max(5000, 'Max 5000 characters').required(requiredMessage),
   image: yup
     .mixed()
     .test('fileSize', requiredMessage, (value) => {
@@ -28,10 +29,10 @@ export const CHARACTER_SETTINGS_SCHEMA_CREATE = yup.object().shape({
       if (!value) return false
       return value instanceof File ? value.size <= 5000000 : false
     })
-    .test('fileType', 'Format must be mpeg, wav or mp3', (value) => {
+    .test('fileType', 'Format must be audio', (value) => {
       if (!value) return false
       return value instanceof File
-        ? ['audio/mpeg', 'audio/wav', 'audio/mp3'].includes(value.type)
+        ? acceptAudioFormats.includes(value.type)
         : false
     }),
   textChatType: yup.object().shape({
@@ -55,7 +56,7 @@ export const CHARACTER_SETTINGS_SCHEMA_CREATE = yup.object().shape({
 
 export const CHARACTER_SETTINGS_SCHEMA_EDIT = yup.object().shape({
   name: yup.string().trim().max(20, 'Max 20 characters').required(requiredMessage),
-  prompt: yup.string().trim().max(1000, 'Max 1000 characters').required(requiredMessage),
+  prompt: yup.string().trim().max(5000, 'Max 5000 characters').required(requiredMessage),
   image: yup
     .mixed()
     .test('fileSize', 'File size must be less 5 MB', (value) => {
@@ -74,10 +75,10 @@ export const CHARACTER_SETTINGS_SCHEMA_EDIT = yup.object().shape({
       if (!value) return true
       return value instanceof File ? value.size <= 5000000 : false
     })
-    .test('fileType', 'Format must be mpeg, wav or mp3', (value) => {
+    .test('fileType', 'Format must be audio', (value) => {
       if (!value) return true
       return value instanceof File
-        ? ['audio/mpeg', 'audio/wav', 'audio/mp3'].includes(value.type)
+        ? acceptAudioFormats.includes(value.type)
         : false
     }),
   textChatType: yup.object().shape({

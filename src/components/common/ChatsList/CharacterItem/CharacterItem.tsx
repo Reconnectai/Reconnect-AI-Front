@@ -14,14 +14,16 @@ interface IProps {
   setSelectedChat: React.Dispatch<React.SetStateAction<number | null>>
   selectedChat: number | null
   chatId?: string
+  refs?: (node?: (Element | null | undefined)) => void
 }
 
-const CharacterItem: FC<IProps> = ({ chat, setSelectedChat, selectedChat, chatId }) => {
+const CharacterItem: FC<IProps> = ({ chat, setSelectedChat, selectedChat, chatId,refs }) => {
   const theme = useTheme()
   const navigate = useNavigate()
   const dispatch: AppDispatch = useDispatch()
   return (
     <Box
+      ref={refs}
       onClick={() => {
         navigate(`/chat/${chat?.id}`, { replace: !!chatId })
         setSelectedChat(chat?.id)

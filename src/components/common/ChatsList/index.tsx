@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
@@ -9,7 +9,7 @@ import { setCharacterListQuery } from 'store/reducers/characterListReducer'
 import { preloadImages } from 'utils/preloadingImages'
 
 import MenuIcon from '@mui/icons-material/Menu'
-import {Box, debounce, IconButton, useTheme} from '@mui/material'
+import { Box, debounce, IconButton, useTheme } from '@mui/material'
 
 import CreateCharacterDrawer from '../CreateCharacterDrawer'
 import MainDrawer from '../MainDrawer'
@@ -33,7 +33,7 @@ const ChatsList = () => {
   const { data: charactersListRTK, isFetching: isLoadingCharactersList } = useGetCharactersQuery({
     page: isCharacterListQuery ? page : 0,
     pageSize: 20,
-    query:debouncedSearch
+    query: debouncedSearch,
   })
   const [charactersList, setCharactersList] = useState<Character[]>([])
   const [openMainDrawer, setOpenMainDrawer] = useState<boolean>(false)
@@ -42,22 +42,26 @@ const ChatsList = () => {
   const [shouldRender, setShouldRender] = useState(false)
   const { ref, inView } = useInView({ threshold: 0.5 })
   useEffect(() => {
-    if (charactersListRTK?.content !== undefined && isCharacterListQuery) {
-      (async () => {
+    const handleCharactersList = async () => {
+      if (charactersListRTK?.content !== undefined && !isLoadingCharactersList) {
         const images = charactersListRTK.content.map((character) => character.image)
         await preloadImages(images)
-        setCharactersList((prev) => [...prev, ...charactersListRTK.content])
+
+        if (isCharacterListQuery) {
+          setCharactersList((prev) => [...prev, ...charactersListRTK.content])
+        } else {
+          setCharactersList(charactersListRTK.content)
+          if (messagesStartRef.current) {
+            messagesStartRef.current.scrollIntoView({ block: 'start' })
+          }
+          setPage(0)
+        }
         setShouldRender(true)
-      })()
-    } else if (charactersListRTK?.content !== undefined && !isCharacterListQuery) {
-      setCharactersList(charactersListRTK.content)
-      if (messagesStartRef.current) {
-        messagesStartRef.current.scrollIntoView({ block: 'start' })
+      } else if (charactersListRTK === undefined && !isLoadingCharactersList) {
+        setShouldRender(true)
       }
-      setPage(0)
-    } else if (charactersListRTK === undefined && !isLoadingCharactersList) {
-      setShouldRender(true)
     }
+    handleCharactersList()
   }, [charactersListRTK, isLoadingCharactersList])
   useEffect(() => {
     if (chatId) setSelectedChat(+chatId)
@@ -69,24 +73,25 @@ const ChatsList = () => {
       inView &&
       !isLoadingCharactersList &&
       charactersListRTK &&
-      charactersListRTK?.totalPages - 1 >= page + 1
+      charactersListRTK?.totalPages - 1 > page
     ) {
-      setPage((prev) => prev + 1)
       dispatch(setCharacterListQuery(true))
+      setPage((prev) => prev + 1)
     }
   }, [inView])
   const debouncedSetSearch = useCallback(
     debounce((value: string) => {
-      setDebouncedSearch(value);
+      setDebouncedSearch(value)
     }, 300),
     []
-  );
+  )
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const value = event.target.value
     dispatch(setCharacterListQuery(false))
     setSearch(value)
-    debouncedSetSearch(value);
+    debouncedSetSearch(value)
   }
+
   return (
     <Box
       sx={{
@@ -153,17 +158,16 @@ const ChatsList = () => {
             messagesStartRef={messagesStartRef}
           />
           {Array.isArray(charactersList) &&
-            charactersList
-              .map((chat) => (
-                <CharacterItem
-                  chat={chat}
-                  setSelectedChat={setSelectedChat}
-                  selectedChat={selectedChat}
-                  chatId={chatId}
-                  key={chat.id}
-                />
-              ))}
-          <Box ref={ref} />
+            charactersList.map((chat, ind) => (
+              <CharacterItem
+                chat={chat}
+                setSelectedChat={setSelectedChat}
+                selectedChat={selectedChat}
+                chatId={chatId}
+                key={chat.id}
+                refs={ind === charactersList.length - 1 ? ref : undefined}
+              />
+            ))}
         </Box>
       )}
       <MainDrawer

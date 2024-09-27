@@ -27,7 +27,7 @@ export const CustomButton: FC<Props> = ({
       disableRipple={variant === 'text'}
       {...rest}
       sx={{
-        backgroundColor: '#4659b0',
+        // backgroundColor: '#4659b0',
         textTransform: 'none',
         display: 'flex',
         alignItems: 'center',

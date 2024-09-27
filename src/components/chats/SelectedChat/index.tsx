@@ -1,5 +1,5 @@
 import { enqueueSnackbar } from 'notistack'
-import React, { FC, UIEvent, useEffect, useMemo, useState } from 'react'
+import React, { FC, UIEvent, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useGetCharacterQuery, useGetCharactersQuery } from 'services/characters/api'
 import { MessageType } from 'services/characters/types'
@@ -11,6 +11,7 @@ import {
 import { IMessage } from 'services/messages/types'
 import { createSocketChatConnection, createSocketMessageConnection } from 'services/socket/socket'
 import { IException, ISocketMessage } from 'services/socket/types'
+import { Socket } from 'socket.io-client'
 import { AppDispatch } from 'store'
 import { setCharacterListQuery } from 'store/reducers/characterListReducer'
 
@@ -58,20 +59,27 @@ const SelectedChat: FC<IProps> = ({ chatId }) => {
   const [isChat, setIsChat] = useState<boolean>(false)
   const [isFirstMessage, setIsFirstMessage] = useState<boolean>(true)
   const [goToEnd, setGoToEnd] = useState<boolean>(true)
-  const socketMessage = useMemo(() => createSocketMessageConnection(chatId || ''), [chatId])
-  const socketChat = useMemo(() => {
-    if (!isLoadingCharacter) {
-      if (
-        character?.textDeployedAt &&
-        (character?.speechChatType === null || character?.audioDeployedAt)
-      ) {
-        setIsChat(true)
-      } else {
-        return createSocketChatConnection(chatId || '')
+  const [socketMessage, setSocketMessage] = useState<Socket | null>(null)
+  const [socketChat, setSocketChat] = useState<Socket | null>(null)
+  useEffect(() => {
+    async function setupSockets() {
+      if (!isLoadingCharacter) {
+        const msgSocket = await createSocketMessageConnection(chatId || '')
+        setSocketMessage(msgSocket)
+        if (
+          character?.textDeployedAt &&
+          (character?.speechChatType === null || character?.audioDeployedAt)
+        ) {
+          setIsChat(true)
+        } else {
+          const chatSocket = await createSocketChatConnection(chatId || '')
+          setSocketChat(chatSocket)
+        }
       }
     }
-  }, [chatId, character, isLoadingCharacter])
 
+    setupSockets()
+  }, [chatId, character, isLoadingCharacter])
   useEffect(() => {
     if (history && !isLoading && Array.isArray(history.content)) {
       let messages = [...history.content]
@@ -90,7 +98,7 @@ const SelectedChat: FC<IProps> = ({ chatId }) => {
             (lastMessage?.messageType + 'Answer') as 'videoAnswer' | 'audioAnswer' | 'textAnswer'
           ] === null
         ) {
-          socketMessage.emit('answer', { id: lastMessage?.id })
+          socketMessage?.emit('answer', { id: lastMessage?.id })
         } else {
           setIsReceiveAnswer(true)
         }
@@ -101,7 +109,7 @@ const SelectedChat: FC<IProps> = ({ chatId }) => {
         autoHideDuration: 3000,
       })
     }
-  }, [history, isLoading])
+  }, [history, isLoading, socketMessage])
 
   useEffect(() => {
     if (socketMessage) {
@@ -167,7 +175,7 @@ const SelectedChat: FC<IProps> = ({ chatId }) => {
       .unwrap()
       .then((data) => {
         setMessages((prevState) => {
-          socketMessage.emit('answer', { id: lastMessageId })
+          socketMessage?.emit('answer', { id: lastMessageId })
           return [...prevState.slice(0, prevState.length - 1), data]
         })
       })
@@ -216,7 +224,7 @@ const SelectedChat: FC<IProps> = ({ chatId }) => {
           refetch()
           setIsFirstMessage(false)
         }
-        socketMessage.emit('answer', { id: data.id })
+        socketMessage?.emit('answer', { id: data.id })
       })
       .catch(() => {
         enqueueSnackbar('Something went wrong. Try again later', {
@@ -267,6 +275,7 @@ const SelectedChat: FC<IProps> = ({ chatId }) => {
         handleScroll={handleScroll}
         isChat={isChat}
         regenerateMessageHandler={regenerateMessageHandler}
+        socketChat={socketChat}
       />
       <WriteMessageSection
         sendMessage={sendMessage}

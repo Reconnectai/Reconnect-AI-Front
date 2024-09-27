@@ -4,7 +4,7 @@ import applyCaseMiddleware from 'axios-case-converter'
 
 import { axiosApi } from './index'
 
-export const tagTypes = ['Characters', 'Messages']
+export const tagTypes = ['Characters', 'Messages','Balance']
 
 const axiosApiWithCaseConverter = applyCaseMiddleware(axiosApi, {
   ignoreHeaders: true,

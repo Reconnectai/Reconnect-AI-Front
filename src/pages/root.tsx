@@ -1,10 +1,9 @@
-import { Outlet, ScrollRestoration } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 
 const Root = () => {
   return (
     <>
       <Outlet />
-      <ScrollRestoration />
     </>
   );
 };

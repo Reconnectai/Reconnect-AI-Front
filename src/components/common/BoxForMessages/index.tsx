@@ -1,4 +1,4 @@
-import JW from 'assets/testAvatar/JohnnieWilliams.png'
+import JW from 'assets/testAvatar/JohnnieWilliams.jpg'
 import React from 'react'
 import { localDateTime } from 'utils/formatDate'
 
@@ -21,7 +21,7 @@ interface IProps {
   shouldRenderAvatar: boolean
   messageError?: string | null
   messageId?: string
-  regenerateMessageHandler?: (lastMessageId:string)=>void
+  regenerateMessageHandler?: (lastMessageId: string) => void
 }
 
 const Message: React.FC<IProps> = ({
